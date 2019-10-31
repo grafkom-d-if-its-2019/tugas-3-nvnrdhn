@@ -121,7 +121,7 @@
     )
     gl.enableVertexAttribArray(vPosition)
     gl.enableVertexAttribArray(vColor)
-    var speed = 0.005, camZ = 0.0, rotator = 0.0
+    var speed = 0.005, camZ = 0.0, camX = 0.0, rotator = 0.0
     var axis = [false, true, false], x = 0, y = 1, z = 2
     var transX = 0.0, transY = 0.0, transZ = 0.0,
         mulX = 0.005, mulY = 0.005, mulZ = 0.005, rot = 0.05
@@ -156,14 +156,16 @@
     gl.uniformMatrix4fv(pmLoc, false, pm)
 
     function onKeyDown(event) {
-      if (event.keyCode == 173) speed -= 0.001
-      if (event.keyCode == 61) speed += 0.001
-      if (event.keyCode == 48) speed = 0
-      if (event.keyCode == 88) axis[x] = !axis[x]
-      if (event.keyCode == 89) axis[y] = !axis[y]
-      if (event.keyCode == 90) axis[z] = !axis[z]
-      if (event.keyCode == 38) camZ -= 0.01
-      if (event.keyCode == 40) camZ += 0.01
+      if (event.key == '-') speed -= 0.001
+      if (event.key == '=') speed += 0.001
+      if (event.key == '0') speed = 0
+      if (event.key == 'x') axis[x] = !axis[x]
+      if (event.key == 'y') axis[y] = !axis[y]
+      if (event.key == 'z') axis[z] = !axis[z]
+      if (event.key == 'ArrowUp') camZ -= 0.01
+      if (event.key == 'ArrowDown') camZ += 0.01
+      // if (event.key == 'ArrowLeft') camX -= 0.01
+      // if (event.key == 'ArrowRight') camX += 0.01
     }
 
     document.addEventListener('keydown', onKeyDown)
@@ -185,8 +187,6 @@
       glMatrix.vec3.subtract(a, plane[1], plane[0])
       glMatrix.vec3.subtract(b, plane[2], plane[1])
       glMatrix.vec3.cross(c, a, b)
-      var lenC = glMatrix.vec3.len(c)
-      glMatrix.vec3.divide(c, c, [lenC,lenC,lenC])
       return Math.abs(glMatrix.vec3.dot(v, c))
     }
 
@@ -200,8 +200,6 @@
             return
           }
         }
-      }
-      for (let i = 0; i < currentN.length; i++) {
         if (calculateDistance(currentN[i], PLANE.BACK) < eps) {
           if (mulZ < 0) {
             mulZ*=-1
@@ -209,24 +207,18 @@
             return
           }
         }
-      }
-      for (let i = 0; i < currentN.length; i++) {
         if (calculateDistance(currentN[i], PLANE.TOP) < eps) {
           if (mulY > 0) {
             mulY*=-1
             return
           }
         }
-      }
-      for (let i = 0; i < currentN.length; i++) {
         if (calculateDistance(currentN[i], PLANE.BOTTOM) < eps) {
           if (mulY < 0) {
             mulY*=-1
             return
           }
         }
-      }
-      for (let i = 0; i < currentN.length; i++) {
         if (calculateDistance(currentN[i], PLANE.RIGHT) < eps) {
           if (mulX > 0) {
             mulX*=-1
@@ -234,8 +226,6 @@
             return
           }
         }
-      }
-      for (let i = 0; i < currentN.length; i++) {
         if (calculateDistance(currentN[i], PLANE.LEFT) < eps) {
           if (mulX < 0) {
             mulX*=-1
@@ -248,7 +238,7 @@
     
     function render() {
       glMatrix.mat4.lookAt(vm,
-        [0.0, 0.0, camZ],  //posisi kamera
+        [camX, 0.0, camZ],  //posisi kamera
         [0.0, 0.0, -1.5], //kemana kamera menghadap (vektor)
         [0.0, 1.0, 0.0]
       )
@@ -278,7 +268,7 @@
 
       glMatrix.mat4.translate(mm, mm, [transX, transY, transZ])
       glMatrix.mat4.rotateY(mm, mm, rotator)
-      glMatrix.mat4.scale(mm, mm, [0.5, 0.5, 0.5])
+      glMatrix.mat4.scale(mm, mm, [0.4, 0.4, 0.4])
       gl.uniformMatrix4fv(mmLoc, false, mm)
       gl.drawArrays(gl.TRIANGLES, 24, nTriangles.length/6)
 
