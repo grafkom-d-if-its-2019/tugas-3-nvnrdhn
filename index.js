@@ -121,7 +121,7 @@
     )
     gl.enableVertexAttribArray(vPosition)
     gl.enableVertexAttribArray(vColor)
-    var speed = 0.005, camZ = 0.0, camX = 0.0, rotator = 0.0
+    var speed = 0.005, camZ = 0.0, rotator = 0.0
     var axis = [false, true, false], x = 0, y = 1, z = 2
     var transX = 0.0, transY = 0.0, transZ = 0.0,
         mulX = 0.005, mulY = 0.005, mulZ = 0.005, rot = 0.05
@@ -164,29 +164,15 @@
       if (event.key == 'z') axis[z] = !axis[z]
       if (event.key == 'ArrowUp') camZ -= 0.01
       if (event.key == 'ArrowDown') camZ += 0.01
-      // if (event.key == 'ArrowLeft') camX -= 0.01
-      // if (event.key == 'ArrowRight') camX += 0.01
     }
 
     document.addEventListener('keydown', onKeyDown)
 
-    function mat_mul(a, b) {
-      var c1 = a[0]*b[0] + a[4]*b[1] + a[8]*b[2] + a[12]*b[3],
-          c2 = a[1]*b[0] + a[5]*b[1] + a[9]*b[2] + a[13]*b[3],
-          c3 = a[2]*b[0] + a[6]*b[1] + a[10]*b[2] + a[14]*b[3],
-          c4 = a[3]*b[0] + a[7]*b[1] + a[11]*b[2] + a[15]*b[3]
-      return [c1, c2, c3, c4]
-    }
-
     function calculateDistance(point, plane) {
-      var v = glMatrix.vec3.create(),
-          a = glMatrix.vec3.create(),
-          b = glMatrix.vec3.create(),
-          c = glMatrix.vec3.create()
-      glMatrix.vec3.subtract(v, point, plane[0])
-      glMatrix.vec3.subtract(a, plane[1], plane[0])
-      glMatrix.vec3.subtract(b, plane[2], plane[1])
-      glMatrix.vec3.cross(c, a, b)
+      var v = glMatrix.vec3.subtract([], point, plane[0]),
+          a = glMatrix.vec3.subtract([], plane[1], plane[0]),
+          b = glMatrix.vec3.subtract([], plane[2], plane[1]),
+          c = glMatrix.vec3.cross([], a, b)
       return Math.abs(glMatrix.vec3.dot(v, c))
     }
 
@@ -238,7 +224,7 @@
     
     function render() {
       glMatrix.mat4.lookAt(vm,
-        [camX, 0.0, camZ],  //posisi kamera
+        [0.0, 0.0, camZ],  //posisi kamera
         [0.0, 0.0, -1.5], //kemana kamera menghadap (vektor)
         [0.0, 1.0, 0.0]
       )
@@ -253,7 +239,7 @@
 
       currentCube = []
       for (let i = 0; i < cubePoints.length; i++) {
-        var t = mat_mul(mm, [...cubePoints[i], 1.0])
+        var t = glMatrix.vec4.transformMat4([], [...cubePoints[i], 1.0], mm)
         currentCube.push(t)
       }
 
@@ -278,7 +264,7 @@
       ]
       currentN = []
       for (let i = 0; i < indices.length; i++) {
-        var t = mat_mul(mm, [...nPoints[indices[i]], 1.0])
+        var t = glMatrix.vec4.transformMat4([], [...nPoints[indices[i]], 1.0], mm)
         currentN.push(t)
       }
 
